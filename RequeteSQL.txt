@@ -1,0 +1,107 @@
+-- 1. Table ParametreCaisse
+CREATE TABLE ParametreCaisse (
+    id INT AUTO_INCREMENT PRIMARY KEY
+);
+
+-- 2. Table TypeSalarie
+CREATE TABLE TypeSalarie (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    libelleType VARCHAR(50) NOT NULL  -- Taille réduite
+);
+
+-- 3. Table CategorieProduit
+CREATE TABLE CategorieProduit (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nomCategorie VARCHAR(50) NOT NULL  -- Taille réduite
+);
+
+-- 4. Table BonDeLivraison
+CREATE TABLE BonDeLivraison (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    dateLivraison DATE
+);
+
+-- 5. Table Caisse
+CREATE TABLE Caisse (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nomCaisse VARCHAR(100) NOT NULL,  -- Taille réduite
+    idParametre INT,
+    FOREIGN KEY (idParametre) REFERENCES ParametreCaisse(id)
+);
+
+-- 6. Table Salarie
+CREATE TABLE Salarie (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    idType INT,
+    matriculeSalarie VARCHAR(20),  -- Taille réduite
+    nomSalarie VARCHAR(50),  -- Taille réduite
+    prenomSalarie VARCHAR(50),  -- Taille réduite
+    identifiant VARCHAR(50) UNIQUE,  -- Taille réduite
+    motDePasse VARCHAR(100),  -- Taille réduite
+    FOREIGN KEY (idType) REFERENCES TypeSalarie(id)
+);
+
+-- 7. Table OperationCaisse
+CREATE TABLE OperationCaisse (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    dateOperation DATE,
+    heureOperation TIME,
+    totalPaiement DECIMAL(10, 2),
+    idCaisse INT,
+    idSalarie INT,
+    FOREIGN KEY (idCaisse) REFERENCES Caisse(id),
+    FOREIGN KEY (idSalarie) REFERENCES Salarie(id)
+);
+
+-- 8. Table Produit
+CREATE TABLE Produit (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    codeProduit VARCHAR(30) NOT NULL,  -- Taille réduite
+    stockMag INT,
+    stockMiniMag INT,
+    designationProduit VARCHAR(100) NOT NULL,  -- Taille réduite
+    prixPdt DECIMAL(10, 2),
+    stockEntrepot INT,
+    idCategorie INT,
+    FOREIGN KEY (idCategorie) REFERENCES CategorieProduit(id)
+);
+
+-- 9. Table TarificationProduit
+CREATE TABLE TarificationProduit (
+    idProduit INT PRIMARY KEY,
+    tauxTVA DECIMAL(5, 2),
+    prixUnitaire DECIMAL(10, 2),
+    FOREIGN KEY (idProduit) REFERENCES Produit(id)
+);
+
+-- 10. Table CmdApproDepot
+CREATE TABLE CmdApproDepot (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    dateCommande DATE,
+    statutCommande VARCHAR(50),  -- Taille réduite
+    idSalarie INT,
+    FOREIGN KEY (idSalarie) REFERENCES Salarie(id)
+);
+
+-- 11. Table DetailsProduit
+CREATE TABLE DetailsProduit (
+    idCommande INT,
+    idProduit INT,
+    qteCmd INT,
+    PRIMARY KEY (idCommande, idProduit),
+    FOREIGN KEY (idCommande) REFERENCES CmdApproDepot(id),
+    FOREIGN KEY (idProduit) REFERENCES Produit(id)
+);
+
+-- 12. Table DetailLivraison
+CREATE TABLE DetailLivraison (
+    idBonLivraison INT,
+    idProduit INT,
+    idCmdeAppropDepot INT,
+    qtePrepa INT,
+    qteRecep INT,
+    PRIMARY KEY (idBonLivraison, idProduit),
+    FOREIGN KEY (idBonLivraison) REFERENCES BonDeLivraison(id),
+    FOREIGN KEY (idProduit) REFERENCES Produit(id),
+    FOREIGN KEY (idCmdeAppropDepot) REFERENCES CmdApproDepot(id)
+);
